@@ -13,7 +13,7 @@ fi
 
 filename=$1
 abspath=$(cd $(dirname $1) && pwd)/$(basename $1)
-filename_noext="${filename&&.iso}"
+filename_noext="${filename%%.iso}"
 MOUNT_DIR="/media/iso"
 
 mkdir -p $MOUNT_DIR || exit 1
