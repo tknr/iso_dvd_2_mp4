@@ -25,4 +25,5 @@ featurePadded=$(printf "%02d" $featureNumber)
 files=$(find "$MOUNT_DIR/VIDEO_TS/" | grep $(echo "VTS_"$featurePadded"_[1-9].VOB") | sort | tr '\n' '|' | sed 's/|$//g' )
 
 ffmpeg -i "concat:$files" -y -movflags +faststart -codec:v libx264 -preset:v placebo -acodec aac -b:a 256k ./"$filename_noext".mp4 || exit 1
+
 umount $MOUNT_DIR
