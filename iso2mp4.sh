@@ -24,5 +24,5 @@ featureNumber=$(dvdbackup -I -i "$MOUNT_DIR" 2> /dev/null | grep 'Title set cont
 featurePadded=$(printf "%02d" $featureNumber)
 files=$(find "$MOUNT_DIR/VIDEO_TS/" | grep $(echo "VTS_"$featurePadded"_[1-9].VOB") | sort | tr '\n' '|' | sed 's/|$//g' )
 
-ffmpeg -i "concat:$files" -y -acodec aac -strict -2 -aq 100 -ac 2 -async 1 -vf "scale=480:-1" -vcodec libx264 -crf 24 -threads 0 ./"$filename_noext".mp4 || exit 1
+ffmpeg -i "concat:$files" -y -movflags +faststart -codec:v libx264 -preset:v placebo -acodec aac -b:a 256k ./"$filename_noext".mp4 || exit 1
 umount $MOUNT_DIR
