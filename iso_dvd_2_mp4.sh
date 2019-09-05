@@ -2,6 +2,7 @@
 
 # Configuration variables START
 MOUNT_DIR="/media/iso"
+FFMPEG=/usr/loca/bin/ffmpeg
 # Configuration variables END
 
 echo
@@ -101,13 +102,13 @@ files=$(find "$MOUNT_DIR/VIDEO_TS/" | grep $(echo "VTS_"$featurePadded"_[1-9].VO
 # ================================================
 # find the default video and audio streams
 # ================================================
-videoMap=$(ffmpeg -i "$MOUNT_DIR/VIDEO_TS/VTS_"$featurePadded"_1.VOB" 2>&1 | grep "\[0x1e0\]: Video" | sed 's/\[.*$//g' | sed 's/[^0-9\.]//g')
-audioMap=$(ffmpeg -i "$MOUNT_DIR/VIDEO_TS/VTS_"$featurePadded"_1.VOB" 2>&1 | grep "\[0x80\]: Audio" | sed 's/\[.*$//g' | sed 's/[^0-9\.]//g')
+videoMap=$(${FFMPEG} -i "$MOUNT_DIR/VIDEO_TS/VTS_"$featurePadded"_1.VOB" 2>&1 | grep "\[0x1e0\]: Video" | sed 's/\[.*$//g' | sed 's/[^0-9\.]//g')
+audioMap=$(${FFMPEG} "$MOUNT_DIR/VIDEO_TS/VTS_"$featurePadded"_1.VOB" 2>&1 | grep "\[0x80\]: Audio" | sed 's/\[.*$//g' | sed 's/[^0-9\.]//g')
 
 # ================================================
 # lets encode
 # ================================================
-ffmpeg -i "concat:$files" -y -map "$videoMap" -map "$audioMap" -acodec libfaac -ar 44100 -aq 70 -async 1 -ac 2 -vf "scale=480:-1" -vcodec libx264 -pass 1/2 -vpre veryslow -crf 25 -threads 0 ./"$filename_noext"'_part'.mp4
+${FFMPEG} -i "concat:$files" -y -map "$videoMap" -map "$audioMap" -deinterlace -movflags +faststart -codec:v libx264 -preset:v placebo -acodec aac -b:a 256k ./"$filename_noext"'_part'.mp4
 
 # ================================================
 # clean up the log files
